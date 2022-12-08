@@ -1,7 +1,9 @@
 ﻿# KI-2022-_Suchverfahren_A*
  
  ## Aufgabenstellung: Wegsuche im Gelände
- ## Einzusetzende Methode: Suchverfahren A*
+
+_Einzusetzende Methode: Suchverfahren A*_ <br>
+
 Es gilt den Weg durch ein labyrinthartiges Gebiet zu finden. Die Landschaft ist von Felswänden, Flüssen, Waldgebieten und Ebenen, sowie teils präparierten Wegen geprägt. Start und Ziel sind bekannt. 
 Nun soll der günstigste Weg gefunden werden. Eine in Planquadrate aufgeteilte Karte des Gebietes 
 liegt vor, diese kennt zwar keine Weglängen, kann jedoch Entfernungen durch die Planquadrate einschätzen. Die Spielfigur, die den Weg durchlaufen soll, verfügt über ein Schlauchboot mit dem sie einen 
