@@ -18,7 +18,17 @@ Landschaftsform sind Kosten zugewiesen, die z.B. einen Zeitverbrauch bei der Dur
 ## Eingangsdaten:
 - Matrix mit Beschreibung des Gebietes
 - Kostentabelle für die oben genannten Landschaftsformen
-- Start- und Zielposition
+- !Bewegungsmöglichkeiten sind immer nur oben/unten/links/rechts - nicht diagaonal!
+- Startposition:
+    - X=12
+    - Y=4
+- Endposition:
+    - X=3
+    - Y=6
+
+
+<img width="590" alt="image" src="https://user-images.githubusercontent.com/75852544/206582926-3a55764f-1ae2-42c1-84e7-52f7e4067301.png">
+
 
 ## Aufgabe:
 - Software entwickeln
