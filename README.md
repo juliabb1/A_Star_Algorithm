@@ -27,7 +27,7 @@ Landschaftsform sind Kosten zugewiesen, die z.B. einen Zeitverbrauch bei der Dur
     - Y=6
 
 <img width="590" alt="image" src="https://user-images.githubusercontent.com/75852544/206582926-3a55764f-1ae2-42c1-84e7-52f7e4067301.png">
-_ Fig1: Code, Bezeichnung und Kosten für verschiedene Landschaften am Beispiel des Beispieldatensets_
+_Fig1: Code, Bezeichnung und Kosten für verschiedene Landschaften am Beispiel des Beispieldatensets_
 
 ## Aufgabe:
 - Software entwickeln
