@@ -18,10 +18,14 @@ class Grid():
         self.height = None
         
         self.extract_data(csv_filename)
-        self.get_pos_grid()
+        self.set_pos_grid()
     
-    def get_pos_grid(self):
-        pos_grid = np.zeros(shape=self.np_grid.shape, dtype=object)
+    
+    """set_pos_grid
+    Sets a numpy array that contains each position of the grid as a tuple (x, y).
+    """
+    def set_pos_grid(self):
+        pos_grid = np.zeros(shape=self.np_grid.shape, dtype=tuple)
         for x in range(self.width):
             for y in range(self.height):
                 pos_grid[x][y] = (x,y)
@@ -63,6 +67,7 @@ class Grid():
         df_start_end_pos.index = ["x", "y"]                                                     # transform dataframe
         df_start_end_pos["Startpunkt"] = df_start_end_pos["Startpunkt"].astype(int)             # clean data
         df_start_end_pos["Endpunkt"] = df_start_end_pos["Endpunkt"].astype(int)                 # clean data
+        df_start_end_pos = df_start_end_pos - 1                                                 # clean data: x/y starts at 0 not 1
         np_start_end_pos = df_start_end_pos.to_numpy().T                                        # to numpy
         self.start_pos = tuple(map(tuple, np_start_end_pos))[0]
         self.end_pos = tuple(map(tuple, np_start_end_pos))[1]
@@ -127,25 +132,25 @@ class Grid():
     Returns:
         * (list[tuple[int, int]]): list of positions that are neighbour posiitons of a given position
     """
-    def get_neighbours_of_pos(self, pos: tuple[int, int]) -> list[tuple[int, int]]:
+    def get_neighbours_of_pos(self, pos: tuple[int, int]) -> dict[str, tuple[int, int]]:
         x = pos[0]
         y = pos[1]
-        neighbours = []
+        neighbours = {}
         
         # right
         right = (x+1, y)
         if(self.in_bounds(right)):
-            neighbours.append((x+1, y))
+            neighbours["right"] = right
         # left
         left = (x-1, y)
         if(self.in_bounds(left)):
-            neighbours.append(left)
+            neighbours["left"] = left
         # up
         up = (x, y+1)
         if(self.in_bounds(up)):
-            neighbours.append(up)
+            neighbours["up"] = up
         # down
         down = (x, y-1)
         if(self.in_bounds(down)):
-            neighbours.append(down)
+            neighbours["down"] = down
         return neighbours        
