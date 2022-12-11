@@ -14,8 +14,6 @@ class Grid():
         self.np_grid = None
         self.pos_grid = None
         self.df_caption = None
-        self.start_pos = None
-        self.end_pos = None
         self.width = None
         self.height = None
         
@@ -57,24 +55,11 @@ class Grid():
         
         ## df_caption
         startrow_caption_data = endrow_landscape_data + 1
-        endrow_caption_data = df_total.loc[pd.isna(df_total[0])].index[1]            # get index of a row containing NaN in column 0
-        nrows_caption_data = endrow_caption_data - startrow_caption_data - 1
-        df_caption = pd.read_csv(path_to_csv, sep=";", encoding="unicode-escape", skiprows=startrow_caption_data, nrows=nrows_caption_data, usecols=["Code", "Bezeichnung", "Kosten"])
+        df_caption = pd.read_csv(path_to_csv, sep=";", encoding="unicode-escape", skiprows=startrow_caption_data, usecols=["Code", "Bezeichnung", "Kosten"])
         df_caption["Code"] = df_caption["Code"].astype(int)                         # clean data
         df_caption["Bezeichnung"] = df_caption["Bezeichnung"].astype(str)           # clean data
         df_caption["Kosten"] = df_caption["Kosten"].astype(float)                   # clean data
         self.df_caption = df_caption
-
-        ## df_start_end_pos
-        startrow_pos_data = endrow_caption_data + 1                                             # get index of a row where start and endpoint information starts
-        df_start_end_pos = pd.read_csv(path_to_csv, sep=";", encoding="unicode-escape", skiprows=startrow_pos_data, usecols=["Startpunkt", "Endpunkt"])
-        df_start_end_pos.index = ["x", "y"]                                                     # transform dataframe
-        df_start_end_pos["Startpunkt"] = df_start_end_pos["Startpunkt"].astype(int)             # clean data
-        df_start_end_pos["Endpunkt"] = df_start_end_pos["Endpunkt"].astype(int)                 # clean data
-        df_start_end_pos = df_start_end_pos - 1                                                 # clean data: x/y starts at 0 not 1
-        np_start_end_pos = df_start_end_pos.to_numpy().T                                        # to numpy
-        self.start_pos = tuple(map(tuple, np_start_end_pos))[0]
-        self.end_pos = tuple(map(tuple, np_start_end_pos))[1]
         
         ## set width and height
         self.height = df_landscape.shape[0]

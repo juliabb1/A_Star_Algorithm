@@ -3,15 +3,24 @@ import grid
 import csv
 import os
 import pandas as pd
+import numpy as np
 
 class Graph():
     
-    def __init__(self, grid: grid.Grid):
+    def __init__(self, grid: grid.Grid, start_pos: tuple[float, float]=(12, 4), end_pos: tuple[float, float] = (3,6)):
         """__init__
         Initializes Graph.
         Params:
             * grid (Grid): grid object that has been constructed by the extracted data
         """
+        # set start and end pos
+        start_x = start_pos[0] - 1
+        start_y = start_pos[1] - 1
+        end_x = end_pos[0] - 1
+        end_y = end_pos[1] - 1
+        self.start_pos = (start_x, start_y)
+        self.end_pos = (end_x, end_y)
+        
         self.grid = grid
         self.start_node = None
         self.end_node = None
@@ -28,8 +37,8 @@ class Graph():
         """set_start_end_nodes
         Initializes the start and end node for the path finding.
         """
-        self.start_node = self.get_node_by_pos(self.grid.start_pos)
-        self.end_node = self.get_node_by_pos(self.grid.end_pos)
+        self.start_node = self.get_node_by_pos(self.start_pos)
+        self.end_node = self.get_node_by_pos(self.end_pos)
     
 
     def set_nodes(self):
@@ -160,23 +169,19 @@ class Graph():
         # open list contains nodes that hasn't been visited
         # either contains the neighbours of a visited node or is the start node
         # closed list contains already visited nodes
-        open_list = []  
-        closed_list = []  
-        open_list.append(self.start_node)
+        open_list = set([self.start_node])  
+        closed_list = set([])  
+        self.start_node.h_score = self.h_score_cost_estimate(self.start_node)
         
         while len(open_list) > 0:
             curr_node = None
+            # find node with lowest f_score
             for node in open_list:
                 if curr_node == None or node.f_score < curr_node.f_score:
                     curr_node = node
             open_list.remove(curr_node)
-            closed_list.append(curr_node)
-            
-            # when current node is none, path doesn't exist
-            if curr_node == None:
-                print('Path does not exist!')
-                return None
-            
+            closed_list.add(curr_node)
+
             # if path to goal is found
             if curr_node == self.end_node:
                 curr = curr_node
@@ -184,23 +189,24 @@ class Graph():
                     self.best_path_solution.append(curr.pos)
                     curr = curr.parent
                 # reverse so it contains pos-tuples from start to end
-                self.best_path_solution.reverse()                  
-                print("Path Found!")
+                self.best_path_solution.reverse()        
+                total_cost = self.get_total_cost()
+                print("Path Found with cost: {}!".format(total_cost))
                 return self.best_path_solution
             
-            # add neighbours to open list
+            # inspect neighbour nodes
             for neighbour_node in self.get_neighbours_of_node(curr_node):
                 new_g_score_of_neighbour_node = curr_node.g_score + neighbour_node.cost
 
                 # if neighbour node is not in open_list and closed_list -> add to open list
                 # also set its parent
                 # and its f, g and h scores
-                if neighbour_node not in open_list and neighbour_node not in closed_list:
-                    open_list.append(neighbour_node)
+                if (neighbour_node not in open_list) and (neighbour_node not in closed_list):
+                    open_list.add(neighbour_node)
                     neighbour_node.parent = curr_node
                     neighbour_node.g_score = new_g_score_of_neighbour_node
-                    neighbour_node.h_Score = self.h_score_cost_estimate(neighbour_node)
-                    neighbour_node.f_score = neighbour_node.g_score + neighbour_node.h_Score
+                    neighbour_node.h_score = self.h_score_cost_estimate(neighbour_node)
+                    neighbour_node.f_score = neighbour_node.g_score + neighbour_node.h_score
                 
                 # else: if neighbour node is in one of the lists
                 # check if other path from current_node to neighbour_node is quicker
@@ -209,16 +215,28 @@ class Graph():
                 elif (neighbour_node in open_list) or (neighbour_node in closed_list) and (new_g_score_of_neighbour_node < neighbour_node.g_score):
                     neighbour_node.parent = curr_node
                     neighbour_node.g_score = new_g_score_of_neighbour_node
-                    neighbour_node.h_Score = self.h_score_cost_estimate(neighbour_node)
-                    neighbour_node.f_score = neighbour_node.g_score + neighbour_node.h_Score
+                    neighbour_node.h_score = self.h_score_cost_estimate(neighbour_node)
+                    neighbour_node.f_score = neighbour_node.g_score + neighbour_node.h_score
                     
                     if neighbour_node in closed_list:
-                        open_list.append(neighbour_node)
+                        open_list.add(neighbour_node)
                         closed_list.remove(neighbour_node)
-                        # update lists 
-    
+
         print('Path does not exist!')
         return None    
+
+    def get_total_cost(self) -> float:
+        """get_total_cost
+        Will get the total cost of the best path solution
+        Returns:
+            float: total cost of best path solution
+        """
+        total_cost = 0 
+        for idx, pos in enumerate(self.best_path_solution):
+            if idx > 0:
+                node = self.get_node_by_pos(pos)
+                total_cost += node.cost
+        return total_cost
 
     def show_best_path_solution_of_a_star(self) -> pd.DataFrame:
         """show_best_path_solution_of_a_star
@@ -229,6 +247,10 @@ class Graph():
             pd.DataFrame: DataFrame with colored best path solution
         """
         df = self.grid.df_grid.astype(int)
+        
+
+        df.index = np.arange(1, len(df)+1)
+        df = df.rename(columns=lambda s: s+1)
         return df.style.apply(self.styling_specific_cell, axis = None)  # Axis set to None to work on entire dataframe
     
     def styling_specific_cell(self, x) -> pd.DataFrame:
@@ -245,80 +267,3 @@ class Graph():
         for (x, y) in self.best_path_solution:
             df_styler.iloc[y, x] = color
         return df_styler
-        
-        
-                
-
-
-# H_COST and cost along axis -- do not use
-    """h_cost
-    Calculates the cost from current node to goal node with the manhatten metric.
-    Calculation via following formula: |dstx - srcx| + |dsty - srcy|
-    
-    Returns:
-        * (float): manhattan distance between a source node to the destination node
-    """
-    """
-    def h_score_cost_estimate(self, src_node: node.Node, dest_node: node.Node) -> float:
-        src_node = self.get_node_by_pos((0, 5))
-        x_cost = self.get_cost_along_axis(src_node=src_node, dest_node=dest_node, axis="x")
-        y_cost = self.get_cost_along_axis(src_node=src_node, dest_node=dest_node, axis="y")
-        return x_cost + y_cost
-    """ 
-    
-    """get_cost_along_axis
-    Calculates the cost along a specific axis (x or y) from the src_node to the destination node.
-    e.g.: Moving from src_node.pos -> end_node.pos: (0,0) -> (1, 1) along x-axis with cost 2 will deliver
-    the value 2 for the x-axis.
-    Params:
-        * axis (str): along which axis the costs should be summed
-        * src_node (Node): node from which it starts to sum up the costs
-        * dest_node (Node): node from which it ends up summing up the costs
-    Returns:
-        * (float): the costs of moving along one axis from a source to a destination node
-    """
-    
-    """
-    def get_cost_along_axis(self, axis:str, src_node: node.Node, dest_node: node.Node) -> float:
-        # set values depending on axis
-        if(axis=="x"):
-            src_axis = src_node.pos[0]
-            dest_axis = dest_node.pos[0]
-        else:
-            src_axis = src_node.pos[1]
-            dest_axis = dest_node.pos[1]
-        
-        # how many nodes to get the cost from
-        dist_along_axis = dest_axis - src_axis
-        
-        # in case of no movement
-        if(dist_along_axis == 0):
-            return 0
-        
-        # conditions for determining the moving direction
-        if(axis=="x"):
-            if dist_along_axis > 0:
-                direction = "right"
-            else:
-                direction = "left"
-            curr_node = src_node
-        else:
-            if dist_along_axis < 0:
-                direction = "up"
-            else:
-                direction = "down"
-            curr_node = dest_node
-        
-        # summing up the costs along one axis
-        costs_along_axis = 0        
-        for i in range(abs(dist_along_axis)):
-            if(axis == "x"):
-                node_offset = self.get_node_by_pos(curr_node.neighbours[direction])
-                curr_node = node_offset
-                costs_along_axis = costs_along_axis + curr_node.cost
-            else:
-                curr_node = self.get_node_by_pos(curr_node.pos)
-                costs_along_axis = costs_along_axis + curr_node.cost
-                curr_node = self.get_node_by_pos(curr_node.neighbours[direction])
-        return costs_along_axis
-    """

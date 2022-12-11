@@ -20,6 +20,6 @@ class Node():
         self.neighbours = {}
         self.parent = None
         self.g_score = 0                    # costs between node and start node
-        self.h_Score = 0                    # heuristic value - (under)estimated costs between node and end node   
+        self.h_score = 0                    # heuristic value - (under)estimated costs between node and end node   
         self.f_score = 0                    # total cost of the node - f = g + h 
     

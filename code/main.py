@@ -16,10 +16,6 @@ if __name__ == '__main__':
     # start a* algorithm and show best path solution
     g.a_start_algorithm()
     # print(g.best_path_solution)
-    
-    for node in g.nodes:
-        print(node.pos)
-        print(node.f_score)
 
     # visualize the path in jupyter notebook with following code:
     # g.a_start_algorithm()
