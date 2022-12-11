@@ -1,6 +1,4 @@
-﻿# KI-2022-_Suchverfahren_A*
- 
- ## Aufgabenstellung: Wegsuche im Gelände
+ # Aufgabenstellung: Wegsuche im Gelände
 
 _Einzusetzende Methode: Suchverfahren A*_ <br>
 
