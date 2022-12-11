@@ -1,7 +1,5 @@
 import node 
 import grid
-import csv
-import os
 import pandas as pd
 import numpy as np
 
@@ -14,12 +12,8 @@ class Graph():
             * grid (Grid): grid object that has been constructed by the extracted data
         """
         # set start and end pos
-        start_x = start_pos[0] - 1
-        start_y = start_pos[1] - 1
-        end_x = end_pos[0] - 1
-        end_y = end_pos[1] - 1
-        self.start_pos = (start_x, start_y)
-        self.end_pos = (end_x, end_y)
+        self.start_pos = self.operation_on_pos_tuple(start_pos, decrement=True)
+        self.end_pos = self.operation_on_pos_tuple(end_pos, decrement=True)
         
         self.grid = grid
         self.start_node = None
@@ -82,7 +76,6 @@ class Graph():
                 return n
         return None
     
-    
 
     def get_neighbours_of_node(self, node: node.Node) -> list[node.Node]:    
         """get_neighbours_of_node
@@ -140,13 +133,26 @@ class Graph():
         src_y = src_node.pos[1]
         dest_y = dest_node.pos[1]
         
-        # set h_score of node
+        # calculates h_score by formula |dstx - srcx| + |dsty - srcy|
         h_score = self.get_sum(abs(dest_x - src_x), abs(dest_y - src_y))
-        
-        # returns h_score value by formula |dstx - srcx| + |dsty - srcy|
         return h_score
 
-
+    def operation_on_pos_tuple(self, tuple: tuple[int, int], increment: bool =False, decrement: bool =False) -> tuple[int, int]:
+        """operation_on_pos_tuple
+        Increments or decrements each value in the tuple by 1.
+        Params:
+            tuple (tuple[int, int]): position as tuple 
+            increment (bool, optional): sets the operation to increment. Defaults to False.
+            decrement (bool, optional): sets the opertion to decrement. Defaults to False.
+        Returns:
+            tuple[int, int]: incremented or decremented position as tuple
+        """            
+        x = tuple[0]
+        y = tuple[1]
+        if increment:
+            return (x+1, y+1)
+        else:
+            return (x-1, y-1)
 
     def a_start_algorithm(self) -> list[tuple[int, int]]:
         """a_start_algorithm
@@ -171,8 +177,10 @@ class Graph():
         # closed list contains already visited nodes
         open_list = set([self.start_node])  
         closed_list = set([])  
+        self.start_node.g_score = 0
         self.start_node.h_score = self.h_score_cost_estimate(self.start_node)
-        
+        self.start_node.f_score = self.start_node.h_score
+
         while len(open_list) > 0:
             curr_node = None
             # find node with lowest f_score
@@ -191,7 +199,8 @@ class Graph():
                 # reverse so it contains pos-tuples from start to end
                 self.best_path_solution.reverse()        
                 total_cost = self.get_total_cost()
-                print("Path Found with cost: {}!".format(total_cost))
+                print("Path Found with total cost of {}!".format(total_cost))
+                print(self.get_best_path_solution())
                 return self.best_path_solution
             
             # inspect neighbour nodes
@@ -212,7 +221,7 @@ class Graph():
                 # check if other path from current_node to neighbour_node is quicker
                 # if yes: update parent data and score data
                 # move neighbour node from closed to open list
-                elif (neighbour_node in open_list) or (neighbour_node in closed_list) and (new_g_score_of_neighbour_node < neighbour_node.g_score):
+                elif ((neighbour_node in open_list) or (neighbour_node in closed_list)) and (new_g_score_of_neighbour_node < neighbour_node.g_score):
                     neighbour_node.parent = curr_node
                     neighbour_node.g_score = new_g_score_of_neighbour_node
                     neighbour_node.h_score = self.h_score_cost_estimate(neighbour_node)
@@ -224,10 +233,24 @@ class Graph():
 
         print('Path does not exist!')
         return None    
+    
+    def get_best_path_solution(self) -> list[tuple[int, int]]:
+        """get_best_path_solution
+        Returns a list of tuples containing the position of the best path solution.
+        The list is more adequate when displaying the best path solution dataframe.
+        The x and y values of the list to the dataframe will get congruent.
+        Returns:
+            list[tuple[int, int]]: adjusted position tuples
+        """
+        path = []
+        for pos in self.best_path_solution:
+            path.append(self.operation_on_pos_tuple(tuple=pos, increment=True))
+        return path   
 
     def get_total_cost(self) -> float:
         """get_total_cost
-        Will get the total cost of the best path solution
+        Will get the total cost of the best path solution by
+        summing up the costs from the start node to the end node.
         Returns:
             float: total cost of best path solution
         """
@@ -247,8 +270,8 @@ class Graph():
             pd.DataFrame: DataFrame with colored best path solution
         """
         df = self.grid.df_grid.astype(int)
-        
-
+        # renames the df index and the df columns
+        # so that they are starting from 1
         df.index = np.arange(1, len(df)+1)
         df = df.rename(columns=lambda s: s+1)
         return df.style.apply(self.styling_specific_cell, axis = None)  # Axis set to None to work on entire dataframe
