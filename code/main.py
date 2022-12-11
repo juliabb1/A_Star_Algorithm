@@ -3,9 +3,9 @@ import grid
                 
 if __name__ == '__main__': 
     # initialization
-    csv_filename = "S_001_Daten.csv"        # in directory ./SEARCH_001/S001                                                                                               
-    landscape = grid.Grid(csv_filename)     # Creates grid from extracted data
-    g = graph.Graph(grid=landscape)         # Creates Graph with nodes
+    csv_filename = "S_001_Daten.csv"                                    # in directory ./SEARCH_001/S001                                                                                               
+    landscape = grid.Grid(csv_filename)                                 # Creates grid from extracted data
+    g = graph.Graph(grid=landscape, start_pos=(12,4), end_pos=(3, 6))   # Creates Graph with nodes
     
     # start a* algorithm and show best path solution
     g.a_start_algorithm()
