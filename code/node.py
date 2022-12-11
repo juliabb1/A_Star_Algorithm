@@ -1,9 +1,10 @@
 class Node():
+    """Class of a Node. Nodes are part of the graph.
+    """
     
     def __init__(self, cost: float, pos: tuple[int, int], code: float, name: str):
         """__init__
         Initializes Node object.
-        
         Params:
             * pos (tuple[int, int]):     position of the node (x, y)
             * cost (float):              cost of the node

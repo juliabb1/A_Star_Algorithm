@@ -4,12 +4,16 @@ import pandas as pd
 import numpy as np
 
 class Graph():
+    """Class of the Graph. The vertices are nodes and the edges represent the connections between the nodes.
+    You can apply the a* algorithm on the graph.
+    """
     
     def __init__(self, grid: grid.Grid, start_pos: tuple[float, float]=(12, 4), end_pos: tuple[float, float] = (3,6)):
-        """__init__
-        Initializes Graph.
+        """Initialized the Graph
         Params:
-            * grid (Grid): grid object that has been constructed by the extracted data
+            grid (grid.Grid): the grid from which the graph should be created from
+            start_pos (tuple[float, float], optional): position pos of the start node. Defaults to (12, 4).
+            end_pos (tuple[float, float], optional): position of the destination node. Defaults to (3,6).
         """
         # set start and end pos
         self.start_pos = self.operation_on_pos_tuple(start_pos, decrement=True)
@@ -27,7 +31,7 @@ class Graph():
         self.set_adjac_list()
 
 
-    def set_start_end_nodes(self):
+    def set_start_end_nodes(self) -> None:
         """set_start_end_nodes
         Initializes the start and end node for the path finding.
         """
@@ -35,7 +39,7 @@ class Graph():
         self.end_node = self.get_node_by_pos(self.end_pos)
     
 
-    def set_nodes(self):
+    def set_nodes(self) -> None:
         """set_nodes
         Instantiates and initializes for every position in the grid a node object and adds it to the
         nodes-list of the graph. Also assigns all neighbour nodes to each node
@@ -50,7 +54,7 @@ class Graph():
         self.assign_neighbour_nodes_to_nodes()
     
 
-    def assign_neighbour_nodes_to_nodes(self):
+    def assign_neighbour_nodes_to_nodes(self) -> None:
         """assign_neighbour_nodes_to_nodes
         Assigns the neighbour nodes to each node.
         For that it iterates through all available nodes.

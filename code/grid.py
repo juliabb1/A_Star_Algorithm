@@ -3,7 +3,9 @@ import os
 import pandas as pd
 
 class Grid():
-
+    """Class of the Grid. It contains the extracted map and it's caption information.
+    """
+    
     def __init__(self, csv_filename: str = "S_001_Daten.csv"):
         """Initializes the grid object.
         Sets the attribute values of the object.
