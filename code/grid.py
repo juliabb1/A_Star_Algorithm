@@ -126,7 +126,7 @@ class Grid():
         Params:
             * pos (tuple[int, int]): position to get the neighbours from
         Returns:
-            * (list[tuple[int, int]]): list of positions that are neighbour posiitons of a given position
+            * (Dict[tuple[int, int]]): Dictionary of positions that are neighbour positions of a given position
         """
         x = pos[0]
         y = pos[1]
